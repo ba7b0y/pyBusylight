@@ -34,7 +34,7 @@ class busylight:
         try:
             if usb_vendor is None or usb_product is None: # probe mode
                 # Device IDs taken from https://github.com/ericpulvino/pyBusylight/issues/2
-                for i in [0x3bca, 0x3bcd, 0x3bcb, 0x3bcc, 0x3bc0, 0xf848]:
+                for i in [0x3bca, 0x3bcd, 0x3bcb, 0x3bcc, 0x3bc0, 0xf848, 0x3bcf]:
                     dev = usb.core.find(idVendor=0x27bb, idProduct=i)
                     if dev:
                         break
