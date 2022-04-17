@@ -7,6 +7,7 @@ import time
 import sys
 import struct
 import threading
+from sys import platform
 
 def signal_handler(signal, frame):
     print('\nCaught CTRL+C turning off.')
@@ -55,7 +56,11 @@ class busylight:
 
         if dev is None: raise ValueError('Device not found')
         dev.reset()
-        if dev.is_kernel_driver_active(0) == True:
+
+        # libusb kernel_driver_active() & detach_kernel_driver() is not available on Windows.
+        # https://libusb.sourceforge.io/api-1.0/group__libusb__dev.html#ga1cabd4660a274f715eeb82de112e0779
+        if "win32" not in platform:
+            if dev.is_kernel_driver_active(0) == True:
                 dev.detach_kernel_driver(0)
 
         dev.set_configuration()
