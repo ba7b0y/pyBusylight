@@ -7,6 +7,7 @@ import time
 import sys
 import struct
 import threading
+from sys import platform
 
 def signal_handler(signal, frame):
     print('\nCaught CTRL+C turning off.')
@@ -34,7 +35,7 @@ class busylight:
         try:
             if usb_vendor is None or usb_product is None: # probe mode
                 # Device IDs taken from https://github.com/ericpulvino/pyBusylight/issues/2
-                for i in [0x3bca, 0x3bcd, 0x3bcb, 0x3bcc, 0x3bc0, 0xf848]:
+                for i in [0x3bca, 0x3bcd, 0x3bcb, 0x3bcc, 0x3bc0, 0xf848, 0x3bcf]:
                     dev = usb.core.find(idVendor=0x27bb, idProduct=i)
                     if dev:
                         break
@@ -55,7 +56,11 @@ class busylight:
 
         if dev is None: raise ValueError('Device not found')
         dev.reset()
-        if dev.is_kernel_driver_active(0) == True:
+
+        # libusb kernel_driver_active() & detach_kernel_driver() is not available on Windows.
+        # https://libusb.sourceforge.io/api-1.0/group__libusb__dev.html#ga1cabd4660a274f715eeb82de112e0779
+        if "win32" not in platform:
+            if dev.is_kernel_driver_active(0) == True:
                 dev.detach_kernel_driver(0)
 
         dev.set_configuration()
